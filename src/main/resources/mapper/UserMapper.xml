@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.springbootbackend.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.yang.springbootbackend.domain.user.entity.User">
+            <id property="id" column="id" />
+            <result property="userName" column="userName" />
+            <result property="userPassword" column="userPassword" />
+            <result property="nickName" column="nickName" />
+            <result property="gender" column="gender" />
+            <result property="email" column="email" />
+            <result property="phone" column="phone" />
+            <result property="avatar" column="avatar" />
+            <result property="userRole" column="userRole" />
+            <result property="isDelete" column="isDelete" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userName,userPassword,nickName,gender,email,
+        phone,avatar,userRole,isDelete,createTime,
+        updateTime
+    </sql>
+</mapper>
