@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>传感器数据监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .card {
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+        }
+        .data-item {
+            margin: 5px 0;
+        }
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>实时传感器数据监控</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2>气体传感器数据</h2>
+            <div id="gas-data">
+                <div class="data-item">气体浓度: <span id="gas-value">--</span>%</div>
+                <div class="data-item">气体预警: <span id="gasrate">--</span></div>
+                <div class="data-item">雨量百分比: <span id="rain-value">--</span>%</div>
+                <div class="data-item">下雨警报: <span id="rainrate">--</span></div>
+                <div class="data-item">吊钩高度: <span id="height">--</span></div>
+                <div class="data-item">光照强度: <span id="lux-value">--</span></div>
+                <div class="data-item">风速: <span id="wind-value">--</span> km/h</div>
+                <div class="data-item">温度: <span id="temperature">--</span>°C</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>角度传感器数据</h2>
+            <div id="angle-data">
+                <div class="data-item">旋转角度: <span id="angle-value">--</span>°</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stompClient = null;
+        
+        function connect() {
+            const socket = new SockJS('/api/ws-endpoint');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                
+                // 订阅气体传感器数据
+                stompClient.subscribe('/topic/gas', function(message) {
+                    const data = JSON.parse(message.body);
+                    updateGasData(data);
+                });
+                
+                // 订阅角度传感器数据
+                stompClient.subscribe('/topic/angle', function(message) {
+                    const data = JSON.parse(message.body);
+                    updateAngleData(data);
+                });
+            }, function(error) {
+                console.log('连接出错: ' + error);
+                setTimeout(connect, 5000); // 5秒后重连
+            });
+        }
+        
+        function updateGasData(data) {
+            document.getElementById('gas-value').textContent = data.gas_value || data.gasValue || '--';
+            document.getElementById('gasrate').textContent = getGasrateText(data.gasrate);
+            document.getElementById('rain-value').textContent = data.rain_value || data.rainValue || '--';
+            document.getElementById('rainrate').textContent = getRainrateText(data.rainrate);
+            document.getElementById('height').textContent = data.height || '--';
+            document.getElementById('lux-value').textContent = data.lux_value || data.luxValue || '--';
+            document.getElementById('wind-value').textContent = data.wind_value || data.windValue || '--';
+            document.getElementById('temperature').textContent = data.temperature || '--';
+            
+            // 添加警告样式
+            if (data.gasrate === 1) {
+                document.getElementById('gasrate').classList.add('warning');
+            } else {
+                document.getElementById('gasrate').classList.remove('warning');
+            }
+            
+            if (data.rainrate === 1) {
+                document.getElementById('rainrate').classList.add('warning');
+            } else {
+                document.getElementById('rainrate').classList.remove('warning');
+            }
+        }
+        
+        function updateAngleData(data) {
+            document.getElementById('angle-value').textContent = data.angle || '--';
+        }
+        
+        function getGasrateText(gasrate) {
+            return gasrate === 1 ? '异常' : '正常';
+        }
+        
+        function getRainrateText(rainrate) {
+            return rainrate === 1 ? '下雨' : '无雨';
+        }
+        
+        // 页面加载后连接WebSocket
+        window.onload = connect;
+    </script>
+</body>
+</html>
