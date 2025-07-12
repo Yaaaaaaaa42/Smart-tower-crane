@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application Properties ###
+src/main/resources/application.yml
+src/main/resources/application-*.yml
+!src/main/resources/application.yml.example
+
+### Logs ###
+logs/
+*.log
+
+### OS Files ###
+.DS_Store
+Thumbs.db
