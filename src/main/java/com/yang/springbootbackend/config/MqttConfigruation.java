@@ -1,6 +1,6 @@
 package com.yang.springbootbackend.config;
 
-import com.yang.springbootbackend.domain.mqtt.MqttConfigurationProperties;
+import com.yang.springbootbackend.config.properties.MqttProperties;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,7 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 public class MqttConfigruation {
 
     @Autowired
-    private MqttConfigurationProperties mqttConfigurationProperties;
+    private MqttProperties mqttProperties;
 
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
@@ -23,11 +23,11 @@ public class MqttConfigruation {
         // 设置清除会话
         options.setCleanSession(true);
         // 设置用户名
-        options.setUserName(mqttConfigurationProperties.getUsername());
+        options.setUserName(mqttProperties.getUsername());
         // 设置密码
-        options.setPassword(mqttConfigurationProperties.getPassword().toCharArray());
+        options.setPassword(mqttProperties.getPassword().toCharArray());
         // 设置URL
-        options.setServerURIs(new String[]{mqttConfigurationProperties.getUrl()});
+        options.setServerURIs(new String[]{mqttProperties.getUrl()});
         // 配置连接参数进工厂
         factory.setConnectionOptions(options);
         return factory;

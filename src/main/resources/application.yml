@@ -89,3 +89,25 @@ knife4j:
         api-rule-resources:
           - com.yang.springbootbackend.controller
 
+# 业务配置
+app:
+  business:
+    verification-code:
+      email-expire-minutes: 5
+      sms-expire-minutes: 5
+      image-expire-minutes: 3
+      send-interval-seconds: 60
+      max-attempts: 5
+    session:
+      expire-minutes: 30
+      single-device-login: true
+      login-cooldown-seconds: 300
+    security:
+      password-salt: "yang"
+      enable-ip-limit: false
+      ip-rate-limit: 100
+    file-upload:
+      max-size-mb: 10
+      allowed-types: ["jpg", "jpeg", "png", "gif", "pdf", "doc", "docx"]
+      upload-path: "/uploads"
+

@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static com.yang.springbootbackend.constant.RedisConstant.*;
 import static com.yang.springbootbackend.constant.UserConstant.USER_LOGIN_MINUTES;
+import static com.yang.springbootbackend.constant.CommonConstant.SESSION_COOKIE_NAME;
 
 
 @RestController

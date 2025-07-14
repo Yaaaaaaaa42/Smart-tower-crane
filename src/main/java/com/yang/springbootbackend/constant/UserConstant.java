@@ -10,8 +10,8 @@ public interface UserConstant {
     // 密码加密的盐
     String SALT = "yang";
 
-    // 默认用户名
-    String DEFAULT_USER_NAME = RandomUtil.generateUniqueCodeWithPrefix("用户");
+    // 默认用户名前缀
+    String DEFAULT_USER_NAME_PREFIX = "用户";
 
     /**
      * 用户名最小长度
@@ -74,10 +74,7 @@ public interface UserConstant {
      */
     String SMS_PARAM_NAME = "code";
     
-    /**
-     * 会话ID的Cookie名称
-     */
-    String SESSION_COOKIE_NAME = "sessionId";
+    // 会话ID的Cookie名称已移至 CommonConstant
     
     /**
      * 用户登录有效期（分钟）

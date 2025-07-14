@@ -22,10 +22,7 @@ public interface RedisConstant {
      */
     String USER_LOGIN_SESSION_KEY = "user:session:";
 
-    /**
-     * 会话ID的Cookie名称
-     */
-    String SESSION_COOKIE_NAME = "sessionId";
+    // 会话ID的Cookie名称已移至 CommonConstant
 
     /**
      * Redis中过期时间

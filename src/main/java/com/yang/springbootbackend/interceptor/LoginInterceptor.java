@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.yang.springbootbackend.constant.RedisConstant.USER_LOGIN_SESSION_KEY;
 import static com.yang.springbootbackend.constant.UserConstant.USER_LOGIN_MINUTES;
+import static com.yang.springbootbackend.constant.CommonConstant.SESSION_COOKIE_NAME;
 
 /**
  * 登录拦截器
@@ -100,14 +101,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (UserConstant.SESSION_COOKIE_NAME.equals(cookie.getName())) {
+                if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
         }
         
         // 如果Cookie中没有，则从请求头中获取
-        return request.getHeader(UserConstant.SESSION_COOKIE_NAME);
+        return request.getHeader(SESSION_COOKIE_NAME);
     }
     
     /**

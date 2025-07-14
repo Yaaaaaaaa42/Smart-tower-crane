@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/sensor")
 public class MainController {
 
-    // 存储最新的传感器数据和角度数据（实际项目中应该使用更合适的数据管理机制）
+    // 存储最新的传感器数据和角度数据
     private static SensorDataDTO latestSensorData = new SensorDataDTO();
     private static AngleDataDTO latestAngleData = new AngleDataDTO();
     

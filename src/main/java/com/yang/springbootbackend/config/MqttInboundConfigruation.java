@@ -1,6 +1,6 @@
 package com.yang.springbootbackend.config;
 
-import com.yang.springbootbackend.domain.mqtt.MqttConfigurationProperties;
+import com.yang.springbootbackend.config.properties.MqttProperties;
 import com.yang.springbootbackend.handler.ReceiverMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ import org.springframework.messaging.MessageHandler;
 public class MqttInboundConfigruation {
 
     @Autowired
-    private MqttConfigurationProperties mqttConfigurationProperties;
+    private MqttProperties mqttProperties;
 
     @Autowired
     private MqttPahoClientFactory mqttClientFactory;
@@ -44,10 +44,10 @@ public class MqttInboundConfigruation {
     public MessageProducer messageProducer() {
         MqttPahoMessageDrivenChannelAdapter adapter =
                 new MqttPahoMessageDrivenChannelAdapter(
-                        mqttConfigurationProperties.getUrl(),
-                        mqttConfigurationProperties.getSubClientId(),
+                        mqttProperties.getUrl(),
+                        mqttProperties.getSubClientId(),
                         mqttClientFactory,
-                        mqttConfigurationProperties.getSubTopic().split(",")
+                        mqttProperties.getSubTopic().split(",")
                 );
 
         // 消息质量

@@ -15,4 +15,13 @@ public class PageController {
     public String sensorMonitor() {
         return "sensor-monitor.html";
     }
+
+    /**
+     * 验证码测试页面
+     */
+    @GetMapping("/image-code")
+    public String imageCode() {
+        return "image-code.html";
+    }
+
 }

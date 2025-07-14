@@ -6,7 +6,8 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yang.springbootbackend.constant.UserConstant.*;
+import com.yang.springbootbackend.constant.UserConstant;
+import com.yang.springbootbackend.util.RandomUtil;
 import com.yang.springbootbackend.domain.user.dto.UserLoginRequest;
 import com.yang.springbootbackend.domain.user.dto.UserRegisterRequest;
 import com.yang.springbootbackend.domain.user.entity.User;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static com.yang.springbootbackend.constant.RedisConstant.*;
-import static com.yang.springbootbackend.constant.RedisConstant.SESSION_COOKIE_NAME;
+import static com.yang.springbootbackend.constant.CommonConstant.SESSION_COOKIE_NAME;
 import static com.yang.springbootbackend.constant.UserConstant.*;
 
 /**
@@ -175,8 +176,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 1. 参数校验
         String userName = userLoginRequest.getUserName();
         String userPassword = userLoginRequest.getUserPassword();
-        ThrowUtils.throwIf(StringUtils.isBlank(userName) || StringUtils.isBlank(userPassword), 
+        ThrowUtils.throwIf(StringUtils.isBlank(userName) || StringUtils.isBlank(userPassword),
                 ErrorCode.PARAMS_ERROR, "用户名或密码不能为空");
+
+        // 1.1 检查登录失败冷却时间
+        checkLoginFailureCooldown(userName);
         
         // 校验用户名长度
         if (userName.length() < MIN_USERNAME_LENGTH) {
@@ -199,6 +203,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         
         // 用户名或密码错误
         if (user == null) {
+            // 登录失败时，使用用户名的hash作为冷却key，避免额外查询
+            setLoginFailureCooldown(userName, 10);
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码错误");
         }
         
@@ -385,7 +391,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setIsDelete(0);
         // 设置默认昵称
         if (StringUtils.isBlank(user.getNickName())) {
-            user.setNickName(DEFAULT_USER_NAME);
+            user.setNickName(RandomUtil.generateUniqueCodeWithPrefix(UserConstant.DEFAULT_USER_NAME_PREFIX));
         }
         return user;
     }
@@ -402,24 +408,69 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 检查用户登录频率，防止短时间内重复登录
-     * 
+     *
      * @param userId 用户ID
      */
     private void checkLoginFrequency(Long userId) {
         String loginCooldownKey = LOGIN_COOLDOWN + userId;
         Boolean hasLoginCooldown = redisTemplate.hasKey(loginCooldownKey);
-        
+
         if (Boolean.TRUE.equals(hasLoginCooldown)) {
             // 获取剩余冷却时间
             Long remainingTime = redisTemplate.getExpire(loginCooldownKey, TimeUnit.SECONDS);
             if (remainingTime != null && remainingTime > 0) {
-                throw new BusinessException(ErrorCode.OPERATION_ERROR, 
+                throw new BusinessException(ErrorCode.OPERATION_ERROR,
                         "登录过于频繁，请在" + remainingTime + "秒后重试");
             }
         }
         
-        // 设置登录冷却时间（10秒）
-        redisTemplate.opsForValue().set(loginCooldownKey, "1", 10, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 设置登录失败冷却时间
+     *
+     * @param userId 用户ID
+     * @param cooldownSeconds 冷却时间（秒）
+     */
+    private void setLoginCooldown(Long userId, int cooldownSeconds) {
+        if (userId != null) {
+            String loginCooldownKey = LOGIN_COOLDOWN + userId;
+            redisTemplate.opsForValue().set(loginCooldownKey, "1", cooldownSeconds, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * 设置登录失败冷却时间（基于用户名）
+     *
+     * @param userName 用户名
+     * @param cooldownSeconds 冷却时间（秒）
+     */
+    private void setLoginFailureCooldown(String userName, int cooldownSeconds) {
+        if (StringUtils.isNotBlank(userName)) {
+            // 使用用户名hash作为key，避免暴露真实用户名
+            String failureKey = LOGIN_COOLDOWN + "failure:" + userName.hashCode();
+            redisTemplate.opsForValue().set(failureKey, "1", cooldownSeconds, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * 检查登录失败冷却时间（基于用户名）
+     *
+     * @param userName 用户名
+     */
+    private void checkLoginFailureCooldown(String userName) {
+        if (StringUtils.isNotBlank(userName)) {
+            String failureKey = LOGIN_COOLDOWN + "failure:" + userName.hashCode();
+            Boolean hasFailureCooldown = redisTemplate.hasKey(failureKey);
+
+            if (Boolean.TRUE.equals(hasFailureCooldown)) {
+                Long remainingTime = redisTemplate.getExpire(failureKey, TimeUnit.SECONDS);
+                if (remainingTime != null && remainingTime > 0) {
+                    throw new BusinessException(ErrorCode.OPERATION_ERROR,
+                            "登录失败次数过多，请在" + remainingTime + "秒后重试");
+                }
+            }
+        }
     }
 
     /**
