@@ -1,5 +1,6 @@
 package com.yang.springbootbackend.domain.mqtt.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -10,6 +11,7 @@ public class SensorDataDTO {
     /**
      * 气体浓度百分比
      */
+    @JSONField(name = "gas_value")
     private Double gasValue;
     
     /**
@@ -20,6 +22,7 @@ public class SensorDataDTO {
     /**
      * 雨量百分比 100为无雨
      */
+    @JSONField(name = "rain_value")
     private Double rainValue;
     
     /**
@@ -35,11 +38,13 @@ public class SensorDataDTO {
     /**
      * 光照强度
      */
+    @JSONField(name = "lux_value")
     private Double luxValue;
     
     /**
      * 风速 km/h
      */
+    @JSONField(name = "wind_value")
     private Double windValue;
     
     /**

@@ -43,4 +43,8 @@ public class UserRegisterRequest {
      */
     private String phone;
 
+    private String imageCodeKey;
+
+    private String imageCode;
+
 }

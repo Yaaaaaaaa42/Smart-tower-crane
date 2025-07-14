@@ -1,4 +1,4 @@
-package com.yang.mqtttest.mqtt.domain;
+package com.yang.springbootbackend.domain.mqtt;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

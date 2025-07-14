@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>验证码测试</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .code-container {
+            display: flex;
+            align-items: center;
+        }
+        #codeImg {
+            height: 40px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<h1>图片验证码测试</h1>
+
+<div class="form-group">
+    <label>用户名</label>
+    <input type="text" id="username" placeholder="请输入用户名">
+</div>
+
+<div class="form-group">
+    <label>密码</label>
+    <input type="password" id="password" placeholder="请输入密码">
+</div>
+
+<div class="form-group">
+    <label>验证码</label>
+    <div class="code-container">
+        <img id="codeImg" src="" alt="验证码" title="点击刷新验证码">
+        <input type="text" id="code" placeholder="请输入验证码" style="width: 120px;">
+        <input type="hidden" id="codeKey">
+    </div>
+</div>
+
+<div class="form-group">
+    <button onclick="login()">登录测试</button>
+    <button onclick="register()">注册测试</button>
+    <button onclick="getImageCode()">刷新验证码</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+    // 页面加载时获取验证码
+    window.onload = function() {
+        getImageCode();
+    };
+
+    // 点击验证码图片刷新
+    document.getElementById('codeImg').addEventListener('click', getImageCode);
+
+    // 获取验证码
+    async function getImageCode() {
+        try {
+            const res = await fetch('/api/user/code/image');
+            const data = await res.json();
+
+            if (data.code === 0) {
+                document.getElementById('codeImg').src = 'data:image/jpeg;base64,' + data.data.imageBase64;
+                document.getElementById('codeKey').value = data.data.codeId;
+            } else {
+                showResult('获取验证码失败: ' + data.message, 'error');
+            }
+        } catch (error) {
+            showResult('获取验证码失败: ' + error.message, 'error');
+        }
+    }
+
+    // 登录测试
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const imageCode = document.getElementById('code').value;
+        const imageCodeKey = document.getElementById('codeKey').value;
+
+        if (!username || !password || !imageCode) {
+            showResult('请填写完整信息', 'error');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userName: username,
+                    userPassword: password,
+                    imageCodeKey: imageCodeKey, // 这里字段名可能也需要修改
+                    imageCode: imageCode
+                })
+            });
+
+            const data = await res.json();
+            showResult(JSON.stringify(data, null, 2), data.code === 0 ? 'success' : 'error');
+
+            // 无论成功失败都刷新验证码
+            getImageCode();
+        } catch (error) {
+            showResult('登录请求失败: ' + error.message, 'error');
+            getImageCode();
+        }
+    }
+
+    // 注册测试
+    async function register() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const imageCode = document.getElementById('code').value;
+        const imageCodeKey = document.getElementById('codeKey').value;
+
+        if (!username || !password || !imageCode) {
+            showResult('请填写完整信息', 'error');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/user/register/phone', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userName: username,
+                    userPassword: password,
+                    checkPassword: password,
+                    phone: '13800138000', // 测试用手机号
+                    imageCodeKey: imageCodeKey,
+                    imageCode: imageCode
+                })
+            });
+
+            const data = await res.json();
+            showResult(JSON.stringify(data, null, 2), data.code === 0 ? 'success' : 'error');
+
+            // 无论成功失败都刷新验证码
+            getImageCode();
+        } catch (error) {
+            showResult('注册请求失败: ' + error.message, 'error');
+            getImageCode();
+        }
+    }
+
+    // 显示结果
+    function showResult(message, type) {
+        const resultElement = document.getElementById('result');
+        resultElement.innerText = message;
+        resultElement.style.display = 'block';
+        resultElement.style.backgroundColor = type === 'success' ? '#dff0d8' : '#f2dede';
+        resultElement.style.color = type === 'success' ? '#3c763d' : '#a94442';
+    }
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-package com.yang.mqtttest.mqtt.config;
+package com.yang.springbootbackend.config;
 
-import com.yang.mqtttest.mqtt.domain.MqttConfigurationProperties;
+import com.yang.springbootbackend.domain.mqtt.MqttConfigurationProperties;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

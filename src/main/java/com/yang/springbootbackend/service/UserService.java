@@ -1,8 +1,13 @@
 package com.yang.springbootbackend.service;
 
+import com.yang.springbootbackend.domain.user.dto.UserLoginRequest;
 import com.yang.springbootbackend.domain.user.dto.UserRegisterRequest;
 import com.yang.springbootbackend.domain.user.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yang.springbootbackend.domain.user.vo.ImageCodeVO;
+import com.yang.springbootbackend.domain.user.vo.UserLoginVO;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author xytx0
@@ -12,12 +17,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface UserService extends IService<User> {
 
     /**
-     * 用户注册
-     * 
+     * 用户手机号注册
+     *
      * @param userRegisterRequest 用户注册请求
      * @return 注册成功的用户ID
      */
-    long userRegister(UserRegisterRequest userRegisterRequest);
+    long userRegisterToPhone(UserRegisterRequest userRegisterRequest);
     
     /**
      * 用户邮箱注册
@@ -26,4 +31,14 @@ public interface UserService extends IService<User> {
      * @return 注册成功的用户ID
      */
     long userRegisterToEmail(UserRegisterRequest userRegisterRequest);
+
+    /**
+     * 用户登陆
+     *
+     * @param userLoginRequest 用户登陆请求
+     * @return 登陆成功的用户信息
+     */
+    UserLoginVO userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request);
+
+
 }

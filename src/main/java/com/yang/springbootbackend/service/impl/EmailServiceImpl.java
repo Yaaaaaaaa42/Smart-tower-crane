@@ -18,9 +18,10 @@ import javax.mail.internet.MimeMessage;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.yang.springbootbackend.constant.EmailConstant.DEFAULT_EMALL_SENDNAME;
+
 import static com.yang.springbootbackend.constant.RedisConstant.CODE_PREFIX;
 import static com.yang.springbootbackend.constant.RedisConstant.EXPIRESECONDS;
+import static com.yang.springbootbackend.constant.UserConstant.DEFAULT_EMALL_SENDNAME;
 import static com.yang.springbootbackend.util.RandomUtil.generateUniqueRandomCode;
 
 /**
@@ -87,6 +88,9 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    /**
+     * 验证邮箱验证码
+     */
     @Override
     public boolean verifyCode(String email, String code) {
         // 从Redis获取存储的验证码

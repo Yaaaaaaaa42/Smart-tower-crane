@@ -77,4 +77,18 @@ public class RandomUtil {
     public static int getUsedCodesCount() {
         return USED_CODES.size();
     }
+    
+    /**
+     * 生成指定位数的随机验证码
+     *
+     * @param length 验证码长度
+     * @return 指定长度的随机验证码
+     */
+    public static String generateRandomCode(int length) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(RANDOM.nextInt(10));
+        }
+        return sb.toString();
+    }
 } 

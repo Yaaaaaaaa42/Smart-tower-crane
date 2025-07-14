@@ -1,7 +1,7 @@
-package com.yang.mqtttest.mqtt.config;
+package com.yang.springbootbackend.config;
 
-import com.yang.mqtttest.mqtt.domain.MqttConfigurationProperties;
-import com.yang.mqtttest.mqtt.handler.ReceiverMessageHandler;
+import com.yang.springbootbackend.domain.mqtt.MqttConfigurationProperties;
+import com.yang.springbootbackend.handler.ReceiverMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,6 @@ import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
